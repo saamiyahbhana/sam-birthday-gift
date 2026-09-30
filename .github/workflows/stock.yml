@@ -1,0 +1,25 @@
+name: iPhone stock check
+
+on:
+  schedule:
+    # Every 5 min, 05:00 to 20:55 Zurich time (UTC+2 until 25 Oct)
+    - cron: "*/5 3-18 * * *"
+  workflow_dispatch:
+    inputs:
+      test:
+        description: "Send a test notification"
+        type: boolean
+        default: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Apple CH pickup stock
+        run: python3 check_stock.py
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          PART_NUMBER: MJXQ4ZD/A
+          TEST: ${{ inputs.test && '1' || '0' }}
